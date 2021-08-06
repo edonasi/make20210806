@@ -1,0 +1,243 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Single">
+      <UniqueIdentifier>{c7f7b760-511b-4b8f-a39a-fd353c8b2548}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Single">
+      <UniqueIdentifier>{382b2dd0-5f06-4a0e-a4fd-f860b716967a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\IncludeFile">
+      <UniqueIdentifier>{d236407a-b479-4c6c-89a8-c7bc74aa540a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Memo">
+      <UniqueIdentifier>{86f08235-6bfe-49cb-8297-894ef3f1f1ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Instance">
+      <UniqueIdentifier>{c945e0a7-942b-47b4-a344-c3d78cc49c7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Instance">
+      <UniqueIdentifier>{cc1b2303-23cc-49f1-ac26-f463b59eb802}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Single\ComInclude">
+      <UniqueIdentifier>{bfe89468-b9cc-4391-9def-68e302201310}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Single\ComInclude">
+      <UniqueIdentifier>{50a0ee47-7d3c-4f9d-b92d-854ebe709aea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Instance\ComInclude">
+      <UniqueIdentifier>{8af9d09e-1a5c-4de5-aa3e-7d479979fabd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Instance\ComInclude">
+      <UniqueIdentifier>{8a1b7cf3-302d-4b0f-9db9-f7aeaa170dd5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Single\AnyInclude">
+      <UniqueIdentifier>{f00b4a63-9d3d-4fa3-b648-9fec9ed2a578}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Single\AnyInclude">
+      <UniqueIdentifier>{55c9c659-028a-4559-ba92-30c95837a5cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Instance\Image">
+      <UniqueIdentifier>{9ce5700a-0647-445c-a502-2b81285634c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Instance\Image">
+      <UniqueIdentifier>{c709cf43-052b-48b1-83a4-120f40e667bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Instance\IntType">
+      <UniqueIdentifier>{bd1f7a81-ce41-48a2-82b8-0cf0847f4e8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Instance\IntType">
+      <UniqueIdentifier>{b6f9c072-4734-4929-805b-2b3511f0f433}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Instance\Coll">
+      <UniqueIdentifier>{d92e9618-2d5c-44f4-a5d2-ca007e504bbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Instance\Coll">
+      <UniqueIdentifier>{940d6eff-adb7-4d5a-b129-05a3e4c6cee3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Aseets\Programs\WinMain.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\Memo\DownloadFileMemo.cpp">
+      <Filter>ソース ファイル\Memo</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\Memo\CppFormatMemo.cpp">
+      <Filter>ソース ファイル\Memo</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\Memo\HppFormatMemo.cpp">
+      <Filter>ソース ファイル\Memo</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\Memo\CppSingleFormatMemo.cpp">
+      <Filter>ソース ファイル\Memo</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\Memo\HppSingleFormatMemo.cpp">
+      <Filter>ソース ファイル\Memo</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\Memo\CppClassFormatMemo.cpp">
+      <Filter>ソース ファイル\Memo</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\Memo\HppClassFormatMemo.cpp">
+      <Filter>ソース ファイル\Memo</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\Fps.cpp">
+      <Filter>ソース ファイル\Single\ComInclude</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\Win.cpp">
+      <Filter>ソース ファイル\Instance\ComInclude</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\Com.cpp">
+      <Filter>ソース ファイル\Instance\ComInclude</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\Keyboard.cpp">
+      <Filter>ソース ファイル\Single\AnyInclude</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\Mouse.cpp">
+      <Filter>ソース ファイル\Single\AnyInclude</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\Audio.cpp">
+      <Filter>ソース ファイル\Instance</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\Fade.cpp">
+      <Filter>ソース ファイル\Instance</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\Cnt.cpp">
+      <Filter>ソース ファイル\Instance</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\AudioMult.cpp">
+      <Filter>ソース ファイル\Single\AnyInclude</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\GameScene.cpp">
+      <Filter>ソース ファイル\Single\AnyInclude</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\GameFlag.cpp">
+      <Filter>ソース ファイル\Single\AnyInclude</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\Img.cpp">
+      <Filter>ソース ファイル\Instance\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\Movie.cpp">
+      <Filter>ソース ファイル\Instance\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\ImgDiv.cpp">
+      <Filter>ソース ファイル\Instance\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\Memo\InheritanceMemo.cpp">
+      <Filter>ソース ファイル\Memo</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\XY.cpp">
+      <Filter>ソース ファイル\Instance\IntType</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\Circle.cpp">
+      <Filter>ソース ファイル\Instance\IntType</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\Rect.cpp">
+      <Filter>ソース ファイル\Instance\IntType</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\CollPoint.cpp">
+      <Filter>ソース ファイル\Instance\Coll</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\CollRect.cpp">
+      <Filter>ソース ファイル\Instance\Coll</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\Coll.cpp">
+      <Filter>ソース ファイル\Instance\Coll</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\ImgColl.cpp">
+      <Filter>ソース ファイル\Instance\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\CollCircle.cpp">
+      <Filter>ソース ファイル\Instance\Coll</Filter>
+    </ClCompile>
+    <ClCompile Include="Aseets\Programs\ImgCollCircle.cpp">
+      <Filter>ソース ファイル\Instance\Image</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Aseets\Programs\IncludeFile.hpp">
+      <Filter>ヘッダー ファイル\IncludeFile</Filter>
+    </ClInclude>
+    <ClInclude Include="Aseets\Programs\Fps.hpp">
+      <Filter>ヘッダー ファイル\Single\ComInclude</Filter>
+    </ClInclude>
+    <ClInclude Include="Aseets\Programs\Win.hpp">
+      <Filter>ヘッダー ファイル\Instance\ComInclude</Filter>
+    </ClInclude>
+    <ClInclude Include="Aseets\Programs\Com.hpp">
+      <Filter>ヘッダー ファイル\Instance\ComInclude</Filter>
+    </ClInclude>
+    <ClInclude Include="Aseets\Programs\Keyboard.hpp">
+      <Filter>ヘッダー ファイル\Single\AnyInclude</Filter>
+    </ClInclude>
+    <ClInclude Include="Aseets\Programs\Mouse.hpp">
+      <Filter>ヘッダー ファイル\Single\AnyInclude</Filter>
+    </ClInclude>
+    <ClInclude Include="Aseets\Programs\Cnt.hpp">
+      <Filter>ヘッダー ファイル\Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="Aseets\Programs\AudioMult.hpp">
+      <Filter>ヘッダー ファイル\Single\AnyInclude</Filter>
+    </ClInclude>
+    <ClInclude Include="Aseets\Programs\GameScene.hpp">
+      <Filter>ヘッダー ファイル\Single\AnyInclude</Filter>
+    </ClInclude>
+    <ClInclude Include="Aseets\Programs\GameFlag.hpp">
+      <Filter>ヘッダー ファイル\Single\AnyInclude</Filter>
+    </ClInclude>
+    <ClInclude Include="Aseets\Programs\Img.hpp">
+      <Filter>ヘッダー ファイル\Instance\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="Aseets\Programs\Movie.hpp">
+      <Filter>ヘッダー ファイル\Instance\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="Aseets\Programs\ImgDiv.hpp">
+      <Filter>ヘッダー ファイル\Instance\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="Aseets\Programs\Audio.hpp">
+      <Filter>ヘッダー ファイル\Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="Aseets\Programs\Fade.hpp">
+      <Filter>ヘッダー ファイル\Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="Aseets\Programs\Circle.hpp">
+      <Filter>ヘッダー ファイル\Instance\IntType</Filter>
+    </ClInclude>
+    <ClInclude Include="Aseets\Programs\XY.hpp">
+      <Filter>ヘッダー ファイル\Instance\IntType</Filter>
+    </ClInclude>
+    <ClInclude Include="Aseets\Programs\Rect.hpp">
+      <Filter>ヘッダー ファイル\Instance\IntType</Filter>
+    </ClInclude>
+    <ClInclude Include="Aseets\Programs\CollPoint.hpp">
+      <Filter>ヘッダー ファイル\Instance\Coll</Filter>
+    </ClInclude>
+    <ClInclude Include="Aseets\Programs\CollRect.hpp">
+      <Filter>ヘッダー ファイル\Instance\Coll</Filter>
+    </ClInclude>
+    <ClInclude Include="Aseets\Programs\Coll.hpp">
+      <Filter>ヘッダー ファイル\Instance\Coll</Filter>
+    </ClInclude>
+    <ClInclude Include="Aseets\Programs\ImgColl.hpp">
+      <Filter>ヘッダー ファイル\Instance\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="Aseets\Programs\CollCircle.hpp">
+      <Filter>ヘッダー ファイル\Instance\Coll</Filter>
+    </ClInclude>
+    <ClInclude Include="Aseets\Programs\ImgCollCircle.hpp">
+      <Filter>ヘッダー ファイル\Instance\Image</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
