@@ -35,6 +35,8 @@ namespace n_game_scene{
 		BACK_LOAD	//裏読み込み中
 	};
 
+	
+
 	//ゲームのシーンを管理
 	class ClGameScene{
 		//*----------------------------------------------------------------------------*
@@ -143,6 +145,7 @@ namespace n_game_scene{
 		SCENE_STATE m_end_state;
 
 		//		変数
+		int m_score;
 		int m_back_move_abs_speed;
 		int m_back_move_speed;
 
@@ -164,10 +167,27 @@ namespace n_game_scene{
 		float m_enemy_drop_interval_max;
 		//弾画像
 		n_img_div::ClImgDivColl m_shot_base;
-		n_img_div::ClImgDivColl m_shot_use[SHOT_MAX];
+		
+		class SHOT
+		{
+		public:
+			SHOT();
+			~SHOT();
+			n_img_div::ClImgDivColl coll_img;
+			n_xy::ClXY start_pos;
+			float degree;
+			float radius;
+
+		private:
+
+		};
+		SHOT m_shot_use[SHOT_MAX];
+		
 		int m_shot_div_x;
 		int m_shot_div_y;
 		int m_shot_div_max;
+		float m_shot_interval;
+		float m_shot_interval_max;
 
 		//音楽
 		n_audio::ClAudio m_title_audio;

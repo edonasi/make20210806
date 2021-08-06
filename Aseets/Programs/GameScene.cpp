@@ -27,6 +27,11 @@ using namespace n_audio;
 using namespace n_img_coll;
 using namespace n_img_div;
 
+//ヘッダで使用するconst
+//const int SHOT_MAX = 40;
+//const int ENEMY_KIND = 7;
+//const int ENEMY_MAX = 10;
+
 
 //*--------------------------------------------------------------------------------*
 //								シングルトン実装
@@ -35,7 +40,7 @@ using namespace n_img_div;
 //シングルトンなGameStateManagerクラスのオブジェクト
 ClGameScene* ClGameScene::m_ins = nullptr;
 
-const string enemy_path[ENEMY_KIND] = {
+const string ENEMY_PATHS[ENEMY_KIND] = {
 	"teki_blue.png",
 	"teki_gray.png",
 	"teki_green.png",
@@ -44,6 +49,14 @@ const string enemy_path[ENEMY_KIND] = {
 	"teki_red.png",
 	"teki_yellow.png"
 };
+
+ClGameScene::SHOT::SHOT(){
+	coll_img = ClImgDivColl();
+	start_pos = n_xy::ClXY();
+	degree = 0.0f;
+	radius = 0.0f;
+}
+ClGameScene::SHOT::~SHOT() { return; }
 
 const float TIME_START = 0.0f;
 
@@ -65,6 +78,7 @@ ClGameScene::ClGameScene() {
 	m_play_state = n_game_scene::ClGameScene::SCENE_STATE::SCENE_END;
 	m_end_state = n_game_scene::ClGameScene::SCENE_STATE::SCENE_END;
 	//変数
+	m_score = 0;
 	m_back_move_abs_speed = 1;
 	m_back_move_speed = 1;
 
@@ -84,15 +98,17 @@ ClGameScene::ClGameScene() {
 		m_enemy_use[i] = ClImgCollCircle();
 	}
 	m_enemy_drop_interval = TIME_START;
-	m_enemy_drop_interval_max = 4.0f;
+	m_enemy_drop_interval_max = 2.0f;
 	//弾画像
 	m_shot_base = ClImgDivColl();
-	for (int i = 0; i < SHOT_MAX; i++) {
-		m_shot_use[i] = ClImgDivColl();
-	}
+	//for (int i = 0; i < SHOT_MAX; i++) {
+	//	m_shot_use[i] = SHOT();
+	//}
 	m_shot_div_x = 4;
 	m_shot_div_y = 1;
 	m_shot_div_max = m_shot_div_x * m_shot_div_y;
+	m_shot_interval = TIME_START;
+	m_shot_interval_max = 0.2f;
 	//音楽
 	m_title_audio = ClAudio();
 	m_play_audio = ClAudio();
@@ -289,7 +305,7 @@ VOID ClGameScene::GameInit() {
 
 	//敵画像の読み込み
 	for (int i = 0; i < ENEMY_KIND; i++) {
-		m_enemy_base[i].Load(enemy_path[i], CPP_NAME, "m_enemy");
+		m_enemy_base[i].Load(ENEMY_PATHS[i], CPP_NAME, "m_enemy");
 		m_enemy_base[i].SetAbsSpeed(1);
 	}
 
@@ -297,8 +313,9 @@ VOID ClGameScene::GameInit() {
 	m_shot_base.Load("ShotRed.png",
 		m_shot_div_x, m_shot_div_y, m_shot_div_max,
 		CPP_NAME, "m_shot");
+	m_shot_base.SetAbsSpeed(2);
 	for (int i = 0; i < SHOT_MAX; i++) {
-		m_shot_use[i] = m_shot_base;
+		m_shot_use[i].coll_img = m_shot_base;
 	}
 	
 	//Bgm読み込み
@@ -443,8 +460,6 @@ VOID ClGameScene::MmTitleDraw() {
 	m_title_back_img.Draw();
 	m_title_logo_img.Draw();
 
-	
-
 	//*---------- ↑描画処理は上に書く↑ ----------*
 	//フェード処理
 	if (m_is_change_secne == TRUE) { m_fade.FadeSameDraw(); }
@@ -486,6 +501,76 @@ VOID ClGameScene::MmPlayProc() {
 		ClMouse::GetIns()->GetPos().x - m_player.GetSize().x / 2,
 		ClMouse::GetIns()->GetPos().y - m_player.GetSize().y / 2);
 
+	//弾の処理
+	//弾の発射待ち
+	if (m_shot_interval != TIME_START && m_shot_interval < m_shot_interval_max) {
+		m_shot_interval += ClFps::GetIns()->GetDeltaTime();
+		DrawString(100, 100, "IIIIII", ClCom().GetRed());
+	}
+	else {
+		DrawString(100, 100, "AAAA", ClCom().GetRed());
+		m_shot_interval = TIME_START;
+	}
+
+	//弾の発射
+	if (ClMouse::GetIns()->GetIsButton(MOUSE_INPUT_LEFT) == TRUE
+		&& m_shot_interval == TIME_START) {
+		
+		for (int i = 0; i < SHOT_MAX; i++) {
+			if (m_shot_use[i].coll_img.GetIsDraw() == FALSE) {
+				m_shot_interval += ClFps::GetIns()->GetDeltaTime();
+				m_shot_use[i].coll_img.SetIsDraw();
+
+				//弾の位置
+				m_shot_use[i].start_pos.x 
+					= m_player.GetPos().x + m_player.GetSize().x / 2 
+					- m_shot_use[i].coll_img.GetRadius();
+				m_shot_use[i].start_pos.y = m_player.GetPos().y;
+
+				m_shot_use[i].coll_img.SetMove(
+					m_shot_use[i].start_pos.x,
+					m_shot_use[i].start_pos.y);
+
+				m_shot_use[i].degree = 270.0f;
+				m_shot_use[i].radius = 0.0f;
+			}
+		}
+	}
+
+	//弾を飛ばす
+	for (int i = 0; i < SHOT_MAX; i++) {
+		if (m_shot_use[i].coll_img.GetIsDraw() == TRUE) {
+			//半径を足す
+			m_shot_use[i].radius += m_shot_use[i].coll_img.GetAbsSpeed();
+
+			//弾の位置を修正
+			//中心位置＋飛ばす角度→飛ばす距離を計算＊距離
+			m_shot_use[i].coll_img.SetMove(
+				m_shot_use[i].start_pos.x
+				+ cos(m_shot_use[i].degree * DX_PI / 180.0f)
+				* m_shot_use[i].radius,
+				m_shot_use[i].start_pos.y
+				+ sin(m_shot_use[i].degree * DX_PI / 180.0f)
+				* m_shot_use[i].radius
+				);
+
+			//画面外に出たら描画しない
+			if (m_shot_use[i].coll_img.GetPos().y
+				+ m_shot_use[i].coll_img.GetSize().y
+				< ClWin().GetWinPivot().y
+				||
+				m_shot_use[i].coll_img.GetPos().y>ClWin().GetWinHeight()
+				||
+				m_shot_use[i].coll_img.GetPos().x
+				+ m_shot_use[i].coll_img.GetSize().x
+				< ClWin().GetWinPivot().x
+				||
+				m_shot_use[i].coll_img.GetPos().x>ClWin().GetWinWidth()){
+				m_shot_use[i].coll_img.SetIsDraw(FALSE);
+			}
+		}
+	}
+
 	//敵の生成
 	if (m_enemy_drop_interval < m_enemy_drop_interval_max) {
 		m_enemy_drop_interval += ClFps::GetIns()->GetDeltaTime();
@@ -493,16 +578,26 @@ VOID ClGameScene::MmPlayProc() {
 	else {
 		//敵のインターバルを初期化
 		m_enemy_drop_interval = TIME_START;
-
 		//敵を生成
 		for (int i = 0; i < ENEMY_MAX; i++) {
 			if (m_enemy_use[i].GetIsDraw() == FALSE) {
-				m_enemy_use[i] = m_enemy_base[i];
-				m_enemy_use[i].SetPos(
+				if (m_score < 1000) {
+					m_enemy_use[i] = m_enemy_base[0];
+				}
+				else if (m_score > 2000) {
+					m_enemy_use[i] = m_enemy_base[1];
+				}
+				else {
+					m_enemy_use[i] = m_enemy_base[GetRand(ENEMY_MAX - 1)];
+				}
+
+				//m_enemy_use[i] = m_enemy_base[i];
+				m_enemy_use[i].SetIsDraw(TRUE);
+				m_enemy_use[i].SetMove(
 					GetRand(ENEMY_MAX - 1) * ClWin().GetWinWidth() / 4,
 					-m_enemy_use[i].GetRadius()
 				);
-				m_enemy_use[i].SetIsDraw(TRUE);
+				
 				break;
 			}
 		}
@@ -513,7 +608,18 @@ VOID ClGameScene::MmPlayProc() {
 		if (m_enemy_use[i].GetIsDraw() == TRUE) {
 			m_enemy_use[i].Move(0, 1);
 
-			if()
+			if (m_enemy_use[i].GetPos().y > ClWin().GetWinHeight()) {
+				m_enemy_use[i].SetIsDraw(FALSE);
+				return;
+			}
+
+			for (int j = 0; j < SHOT_MAX; j++) {
+				if (m_enemy_use[i].IsStay(m_shot_use[j].coll_img.GetColl()) == TRUE) {
+					m_enemy_use[i].SetIsDraw(FALSE);
+					m_shot_use[j].coll_img.SetIsDraw(FALSE);
+					m_score += 100;
+				}
+			}
 		}
 	}
 
@@ -600,6 +706,12 @@ VOID ClGameScene::MmPlayDraw() {
 	//背景画像の描画
 	m_play_back_img_start.Draw();
 	m_play_back_img_up.Draw();
+
+	//敵の描画
+	for (int i = 0; i < ENEMY_MAX; i++) { m_enemy_use[i].Draw(); }
+
+	//弾の描画
+	for (int i = 0; i < SHOT_MAX; i++) { m_shot_use[i].coll_img.Draw(); }
 
 	//プレイヤーの画像を描画
 	m_player.Draw();

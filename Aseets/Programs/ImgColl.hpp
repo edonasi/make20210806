@@ -52,6 +52,8 @@ namespace n_img_coll {
 		n_circle::ClCircle GetCollCircle();
 		BOOL GetIsDraw();
 		int GetRadius();
+		int GetHandle();
+		VOID SetHandle(int handle);
 		VOID SetIsDraw()override;
 		VOID SetIsDraw(BOOL is_set)override;
 		VOID SetIsDraw(BOOL is_draw, BOOL is_coll);

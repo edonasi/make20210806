@@ -439,7 +439,15 @@ ClImgDivColl::~ClImgDivColl() { return; }
 //		プロパティ
 //*------------------------------------------------*
 
-ClCircle ClImgDivColl::GetCollRect() { return m_coll.GetColl(); }
+ClCircle ClImgDivColl::GetColl() { return m_coll.GetColl(); }
+
+int ClImgDivColl::GetRadius() { return m_coll.GetRadius(); }
+
+BOOL ClImgDivColl::GetIsDraw() { return m_is_draw; }
+
+int ClImgDivColl::GetAbsSpeed() { return m_abs_speed; }
+
+ClXY ClImgDivColl::GetSize() { return m_size; }
 
 VOID ClImgDivColl::SetIsDraw() {
 	m_is_draw = TRUE;

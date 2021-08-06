@@ -98,7 +98,11 @@ namespace n_img_div {
 		~ClImgDivColl();
 
 		//		プロパティ
-		n_circle::ClCircle GetCollRect();
+		n_circle::ClCircle GetColl();
+		int GetRadius();
+		BOOL GetIsDraw();
+		int GetAbsSpeed();
+		n_xy::ClXY GetSize();
 		VOID SetIsDraw()override;
 		VOID SetIsDraw(BOOL is_set)override;
 		VOID SetIsDraw(BOOL is_draw, BOOL is_coll);

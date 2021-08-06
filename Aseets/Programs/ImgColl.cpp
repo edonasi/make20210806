@@ -134,6 +134,10 @@ BOOL ClImgCollCircle::GetIsDraw() { return m_is_draw; }
 
 int ClImgCollCircle::GetRadius() { return m_coll_circle.GetRadius(); }
 
+int ClImgCollCircle::GetHandle() { return m_handle; }
+
+VOID ClImgCollCircle::SetHandle(int handle) { m_handle = handle; }
+
 VOID ClImgCollCircle::SetIsDraw() {
 	m_is_draw = TRUE;
 	m_coll_circle.SetIsColl(TRUE);
