@@ -14,6 +14,7 @@ namespace n_coll_circle {
 		~ClCollCircle();
 
 		//		プロパティ
+		int GetRadius();
 		n_circle::ClCircle GetColl();		//当たり判定範囲を参照
 		VOID SetColl(int x, int y, int radius);//当たり判定範囲を設定(is_coll=FALSEでも可能)
 

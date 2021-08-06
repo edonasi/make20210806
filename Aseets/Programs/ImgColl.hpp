@@ -17,6 +17,7 @@ namespace n_img_coll {
 
 		//		プロパティ
 		n_rect::ClRect GetCollRect();
+		n_xy::ClXY GetSize();
 		VOID SetIsDraw()override;
 		VOID SetIsDraw(BOOL is_set)override;
 		VOID SetIsDraw(BOOL is_draw, BOOL is_coll);
@@ -28,6 +29,7 @@ namespace n_img_coll {
 		VOID CollDebugDraw();
 		VOID Delete()override;
 		VOID Move(int x_mult, int y_mult)override;
+		VOID SetMove(int x, int y);
 		//当たり判定
 		BOOL IsStay(n_xy::ClXY point);
 		BOOL IsStay(n_rect::ClRect rect);
@@ -48,6 +50,8 @@ namespace n_img_coll {
 
 		//		プロパティ
 		n_circle::ClCircle GetCollCircle();
+		BOOL GetIsDraw();
+		int GetRadius();
 		VOID SetIsDraw()override;
 		VOID SetIsDraw(BOOL is_set)override;
 		VOID SetIsDraw(BOOL is_draw, BOOL is_coll);

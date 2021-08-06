@@ -162,9 +162,6 @@
     <ClCompile Include="Aseets\Programs\CollCircle.cpp">
       <Filter>ソース ファイル\Instance\Coll</Filter>
     </ClCompile>
-    <ClCompile Include="Aseets\Programs\ImgCollCircle.cpp">
-      <Filter>ソース ファイル\Instance\Image</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Aseets\Programs\IncludeFile.hpp">
@@ -235,9 +232,6 @@
     </ClInclude>
     <ClInclude Include="Aseets\Programs\CollCircle.hpp">
       <Filter>ヘッダー ファイル\Instance\Coll</Filter>
-    </ClInclude>
-    <ClInclude Include="Aseets\Programs\ImgCollCircle.hpp">
-      <Filter>ヘッダー ファイル\Instance\Image</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

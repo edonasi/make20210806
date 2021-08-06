@@ -11,6 +11,11 @@
 //		自身のファイル
 #include IMG_DIV_HPP
 using namespace n_img_div;
+//		ネーム
+using namespace n_xy;
+using namespace n_rect;
+using namespace n_circle;
+using namespace n_coll_circle;
 
 //*--------------------------------------------------------------------------------*
 //								コンストラクタ
@@ -415,5 +420,119 @@ BOOL ClImgDiv::Load(string path, string cpp_name, string ins_name, BOOL is_draw)
 
 BOOL ClImgDiv::MmLoad(string path, string cpp_name, string ins_name) {
 	ClCom().VirtualError();
+	return FALSE;
+}
+
+//*--------------------------------------------------------------------------------*
+//								分割画像当たり判定丸管理クラス
+//*--------------------------------------------------------------------------------*
+
+//*------------------------------------------------*
+//		コンストラクタ
+//*------------------------------------------------*
+
+ClImgDivColl::ClImgDivColl() { m_coll = ClCollCircle(); }
+
+ClImgDivColl::~ClImgDivColl() { return; }
+
+//*------------------------------------------------*
+//		プロパティ
+//*------------------------------------------------*
+
+ClCircle ClImgDivColl::GetCollRect() { return m_coll.GetColl(); }
+
+VOID ClImgDivColl::SetIsDraw() {
+	m_is_draw = TRUE;
+	m_coll.SetIsColl(TRUE);
+}
+
+VOID ClImgDivColl::SetIsDraw(BOOL is_set) {
+	m_is_draw = is_set;
+	m_coll.SetIsColl(is_set);
+}
+
+VOID ClImgDivColl::SetIsDraw(BOOL is_draw, BOOL is_coll) {
+	m_is_draw = is_draw;
+	m_coll.SetIsColl(is_coll);
+}
+
+//*------------------------------------------------*
+//		関数
+//*------------------------------------------------*
+
+//		関数
+BOOL ClImgDivColl::Load(string path, int div_x, int div_y, int div_max,
+	string cpp_name, string ins_name) {
+	//FALSEなら読み込み失敗
+	if (MmLoad(
+		path, div_x, div_y, div_max,
+		div_max, DEFALT_ALL_DRAW_TIME, n_cnt::CNT_AFTER_TYPE::LOOP,
+		cpp_name, ins_name) == FALSE
+		) {
+		return FALSE;
+	}
+
+	int radius = m_size.x < m_size.y ? m_size.x / 2 : m_size.y / 2;
+	m_coll.SetColl(m_pos.x + m_size.x / 2, m_pos.y + m_size.y / 2, radius);
+
+	return TRUE;	//読み込み成功
+}
+
+VOID ClImgDivColl::Draw() {
+	if (m_is_draw == FALSE) { return; }
+	m_cnt.Proc();
+	if (m_div_handle.size() == HANDLE_VEC_EMPTY) { return; }
+	DrawGraph(m_pos.x, m_pos.y, m_div_handle[m_cnt.GetIndex()], TRUE);
+
+	m_coll.DrawDebug();
+}
+
+VOID ClImgDivColl::Draw(BOOL is_coll_draw) {
+	if (m_is_draw == FALSE) { return; }
+	m_cnt.Proc();
+	if (m_div_handle.size() == HANDLE_VEC_EMPTY) { return; }
+	DrawGraph(m_pos.x, m_pos.y, m_div_handle[m_cnt.GetIndex()], TRUE);
+
+	if (is_coll_draw == TRUE) { m_coll.DrawDebug(); }
+}
+
+VOID ClImgDivColl::CollDebugDraw() {
+	m_coll.DrawDebug();
+}
+
+VOID ClImgDivColl::Delete() {
+	for (unsigned int i = 0; i < m_div_handle.size(); i++) {
+		DeleteGraph(m_div_handle[i]);
+	}
+	m_is_draw = FALSE;
+	m_coll.SetIsColl(FALSE);
+}
+
+VOID ClImgDivColl::Move(int x_mult, int y_mult) {
+	m_pos.x += ClFps::GetIns()->GetFpsIntFix(x_mult * m_abs_speed, &m_over_speed);
+	m_pos.y += ClFps::GetIns()->GetFpsIntFix(y_mult * m_abs_speed, &m_over_speed);
+	m_coll.Update(m_pos.x + m_size.x / 2, m_pos.y + m_size.y / 2);
+}
+
+
+VOID ClImgDivColl::SetMove(int x, int y) {
+	m_pos.x = x;
+	m_pos.y = y;
+	m_coll.Update(m_pos.x + m_size.x / 2, m_pos.y + m_size.y / 2);
+}
+
+//当たり判定
+BOOL ClImgDivColl::IsStay(n_xy::ClXY point) {
+	if (m_coll.IsStay(point) == TRUE) { return TRUE; }
+	return FALSE;
+}
+
+BOOL ClImgDivColl::IsStay(n_rect::ClRect rect) {
+	if (m_coll.IsStay(rect) == TRUE) { return TRUE; }
+	return FALSE;
+}
+
+BOOL ClImgDivColl::IsStay(n_circle::ClCircle circle) {
+	if (m_coll.IsStay(circle) == TRUE) { return TRUE; }
 	return FALSE;
 }

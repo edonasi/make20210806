@@ -29,6 +29,8 @@ ClCollCircle::~ClCollCircle() { return; }
 //								プロパティ
 //*--------------------------------------------------------------------------------*
 
+int ClCollCircle::GetRadius() { return m_coll.radius; }
+
 //当たり判定範囲を参照
 ClCircle ClCollCircle::GetColl() { return m_coll; }
 

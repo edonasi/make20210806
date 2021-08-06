@@ -19,8 +19,8 @@ namespace n_audio{
 	public:
 		//		コンストラクタ、デストラクタ、変数の初期化
 		ClAudio();
-		ClAudio(const ClAudio& src);
-		ClAudio& operator=(const ClAudio& src);
+		/*ClAudio(const ClAudio& src);
+		ClAudio& operator=(const ClAudio& src);*/
 		~ClAudio();
 
 		//		プロパティ
@@ -42,6 +42,7 @@ namespace n_audio{
 			string cpp_name, string ins_name);
 
 		VOID Sound();	//音楽を再生
+		VOID Stop();	//音楽を停止
 		VOID Delete(BOOL is_vector_erase);	//音楽のメモリ消去
 
 

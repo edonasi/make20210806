@@ -31,6 +31,10 @@ ClRect ClImgColl::GetCollRect() {
 	return m_coll_rect.GetColl();
 }
 
+n_xy::ClXY ClImgColl::GetSize() {
+	return m_size;
+}
+
 VOID ClImgColl::SetIsDraw() {
 	m_is_draw = TRUE;
 	m_coll_rect.SetIsColl(TRUE);
@@ -85,6 +89,12 @@ VOID ClImgColl::Move(int x_mult, int y_mult) {
 	m_coll_rect.Update(m_pos.x, m_pos.y);
 }
 
+VOID ClImgColl::SetMove(int x, int y) {
+	m_pos.x = x;
+	m_pos.y = y;
+	m_coll_rect.Update(m_pos.x, m_pos.y);
+}
+
 BOOL ClImgColl::IsStay(n_xy::ClXY point) {
 	if (m_coll_rect.IsStay(point) == TRUE) { return TRUE; }
 	return FALSE;
@@ -119,6 +129,10 @@ ClImgCollCircle::~ClImgCollCircle() { return; }
 ClCircle ClImgCollCircle::GetCollCircle() {
 	return m_coll_circle.GetColl();
 }
+
+BOOL ClImgCollCircle::GetIsDraw() { return m_is_draw; }
+
+int ClImgCollCircle::GetRadius() { return m_coll_circle.GetRadius(); }
 
 VOID ClImgCollCircle::SetIsDraw() {
 	m_is_draw = TRUE;

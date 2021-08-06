@@ -166,7 +166,6 @@
     <ClCompile Include="Aseets\Programs\GameScene.cpp" />
     <ClCompile Include="Aseets\Programs\Img.cpp" />
     <ClCompile Include="Aseets\Programs\ImgColl.cpp" />
-    <ClCompile Include="Aseets\Programs\ImgCollCircle.cpp" />
     <ClCompile Include="Aseets\Programs\ImgDiv.cpp" />
     <ClCompile Include="Aseets\Programs\Keyboard.cpp" />
     <ClCompile Include="Aseets\Programs\Memo\CppClassFormatMemo.cpp" />
@@ -200,7 +199,6 @@
     <ClInclude Include="Aseets\Programs\GameScene.hpp" />
     <ClInclude Include="Aseets\Programs\Img.hpp" />
     <ClInclude Include="Aseets\Programs\ImgColl.hpp" />
-    <ClInclude Include="Aseets\Programs\ImgCollCircle.hpp" />
     <ClInclude Include="Aseets\Programs\ImgDiv.hpp" />
     <ClInclude Include="Aseets\Programs\IncludeFile.hpp" />
     <ClInclude Include="Aseets\Programs\Keyboard.hpp" />

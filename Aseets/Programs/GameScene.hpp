@@ -2,13 +2,21 @@
 
 //		自作ファイル
 #include FADE_HPP	//画面切り替え時、フェードを使用
+#include IMG_HPP	//画像読み込み
+#include IMG_DIV_HPP
+#include IMG_COLL_HPP
+#include AUDIO_HPP
+
+#define SHOT_MAX 40
+#define ENEMY_KIND 7
+#define ENEMY_MAX 10
 
 namespace n_game_scene{
 
 	//		enum
 	//ゲームシーン
 	enum GAME_SCENE {
-		LOAD,		//読み込み中
+		END,		//終わり
 		TITLE,		//タイトル
 		PLAY,		//ゲームシーン
 	};
@@ -49,12 +57,12 @@ namespace n_game_scene{
 			FADE_DOWN_END_AFTER,
 			FADE_UP_START,
 			FADE_UP_START_AFTER,
-			END,
+			SCENE_END,
 			NEXT_SCENE
 		};
 
 		//		プロパティ
-		VOID ChangeSceneLoad();		//ロードシーンに遷移
+		VOID ChangeSceneEnd();		//ロードシーンに遷移
 		VOID ChangeSceneTitle();	//タイトルシーンに遷移
 		VOID ChangeScenePlay();		//プレイシーンに遷移
 
@@ -80,14 +88,6 @@ namespace n_game_scene{
 
 		//		メンバ関数
 		//シーンによっての処理
-		//ロード
-		BOOL MmIsLoadProcDo();	//処理を行うか
-		VOID MmLoadProc();		//処理
-		VOID MmLoadStart();		//シーン開始処理
-		VOID MmLoadProcStart();	//処理開始処理
-		VOID MmLoadProcEnd();	//フェードアウト開始地点処理
-		VOID MmLoadEnd();		//フェードアウト完了地点処理
-		VOID MmLoadDraw();		//描画
 		//タイトル
 		BOOL MmIsTitleProcDo();	//処理を行うか
 		VOID MmTitleProc();		//処理
@@ -104,6 +104,14 @@ namespace n_game_scene{
 		VOID MmPlayProcEnd();	//フェードアウト完了開始地点処理
 		VOID MmPlayEnd();		//シーン終了地点処理
 		VOID MmPlayDraw();		//描画
+		//エンド
+		BOOL MmIsEndProcDo();	//処理を行うか
+		VOID MmEndProc();		//処理
+		VOID MmEndStart();		//シーン開始処理
+		VOID MmEndProcStart();	//処理開始処理
+		VOID MmEndProcEnd();	//フェードアウト開始地点処理
+		VOID MmEndEnd();		//フェードアウト完了地点処理
+		VOID MmEndDraw();		//描画
 		//
 		VOID MmSceneChangeProc();	//シーン変更の処理
 		VOID MmEnd(SCENE_STATE* scene_state);
@@ -126,12 +134,44 @@ namespace n_game_scene{
 		BOOL m_is_change_secne;
 		n_fade::ClFade m_fade;
 		//処理を止めるか
-		BOOL m_is_load_proc_stop;
 		BOOL m_is_title_proc_stop;
 		BOOL m_is_play_proc_stop;
+		BOOL m_is_end_proc_stop;
 		//シーンそれぞれの進行状況
-		SCENE_STATE m_load_state;
 		SCENE_STATE m_title_state;
 		SCENE_STATE m_play_state;
+		SCENE_STATE m_end_state;
+
+		//		変数
+		int m_back_move_abs_speed;
+		int m_back_move_speed;
+
+		//		読み込むもの
+		//画像
+		//背景画像
+		n_img::ClImg m_title_back_img;
+		n_img::ClImg m_play_back_img_start;
+		n_img::ClImg m_play_back_img_up;
+		n_img::ClImg m_end_back_img;
+		//ロゴ
+		n_img::ClImg m_title_logo_img;
+		n_img::ClImg m_end_logo_img;
+		//機体画像
+		n_img_coll::ClImgColl m_player;
+		n_img_coll::ClImgCollCircle m_enemy_base[ENEMY_KIND];
+		n_img_coll::ClImgCollCircle m_enemy_use[ENEMY_MAX];
+		float m_enemy_drop_interval;
+		float m_enemy_drop_interval_max;
+		//弾画像
+		n_img_div::ClImgDivColl m_shot_base;
+		n_img_div::ClImgDivColl m_shot_use[SHOT_MAX];
+		int m_shot_div_x;
+		int m_shot_div_y;
+		int m_shot_div_max;
+
+		//音楽
+		n_audio::ClAudio m_title_audio;
+		n_audio::ClAudio m_play_audio;
+		n_audio::ClAudio m_end_audio;
 	};
 }

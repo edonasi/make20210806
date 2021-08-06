@@ -30,19 +30,19 @@ ClAudio::ClAudio() {
 	m_se_type = SE_TYPE::BGM;
 }
 
-//コピーコンストラクタ
-ClAudio::ClAudio(const ClAudio &src) { 
-	m_handle = src.m_handle;
-	m_path = src.m_path;
-	m_product_volume = src.m_product_volume;
-	m_play_type = src.m_play_type;
-	m_se_type = src.m_se_type;
-	return; 
-}
-ClAudio &ClAudio::operator=(const ClAudio &src) { 
-	if (this != &src) { ClAudio::operator=(src); }
-	return (*this);
-}
+////コピーコンストラクタ
+//ClAudio::ClAudio(const ClAudio &src) { 
+//	m_handle = src.m_handle;
+//	m_path = src.m_path;
+//	m_product_volume = src.m_product_volume;
+//	m_play_type = src.m_play_type;
+//	m_se_type = src.m_se_type;
+//	return; 
+//}
+//ClAudio &ClAudio::operator=(const ClAudio &src) { 
+//	if (this != &src) { ClAudio::operator=(src); }
+//	return (*this);
+//}
 ClAudio::~ClAudio() { return; }
 
 //*--------------------------------------------------------------------------------*
@@ -215,6 +215,14 @@ VOID ClAudio::Sound() {
 	if (CheckSoundMem(m_handle) == FALSE) {
 		PlaySoundMem(m_handle, m_play_type);
 	}
+}
+
+VOID ClAudio::Stop() {
+	//再生されていないなら処理しない
+	if (CheckSoundMem(m_handle) == FALSE) { return; }
+
+	//音楽を停止
+	StopSoundMem(m_handle);
 }
 
 /// <summary>

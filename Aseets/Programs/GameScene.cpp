@@ -13,6 +13,20 @@ using namespace n_game_scene;
 //		自作ヘッダファイル
 #include AUDIO_MULT_HPP
 using namespace n_audio_mult;
+#include KEYBOARD_HPP
+using namespace n_keyboard;
+#include MOUSE_HPP
+using namespace n_mouse;
+//		標準ファイル
+#include <math.h>
+using namespace std;
+//		ネーム
+using namespace n_img;
+using namespace n_img_div;
+using namespace n_audio;
+using namespace n_img_coll;
+using namespace n_img_div;
+
 
 //*--------------------------------------------------------------------------------*
 //								シングルトン実装
@@ -21,23 +35,69 @@ using namespace n_audio_mult;
 //シングルトンなGameStateManagerクラスのオブジェクト
 ClGameScene* ClGameScene::m_ins = nullptr;
 
+const string enemy_path[ENEMY_KIND] = {
+	"teki_blue.png",
+	"teki_gray.png",
+	"teki_green.png",
+	"teki_mizu.png",
+	"teki_purple.png",
+	"teki_red.png",
+	"teki_yellow.png"
+};
+
+const float TIME_START = 0.0f;
+
 /// <summary>
 /// コンストラクタ、初期化
 /// </summary>
 ClGameScene::ClGameScene() { 
-	m_scene = n_game_scene::GAME_SCENE::LOAD;
-	m_next_scene = n_game_scene::GAME_SCENE::LOAD;
+	m_scene = n_game_scene::GAME_SCENE::TITLE;
+	m_next_scene = n_game_scene::GAME_SCENE::TITLE;
 	m_back_scene = n_game_scene::BACK_GAME_SCENE::NONE;
 	m_is_change_secne = FALSE;
 	m_fade = n_fade::ClFade();
 	//処理を止めるか
-	m_is_load_proc_stop = FALSE;
+	m_is_end_proc_stop = FALSE;
 	m_is_title_proc_stop = FALSE;
 	m_is_play_proc_stop = FALSE;
 	//シーンそれぞれの進行状況
-	m_load_state = n_game_scene::ClGameScene::SCENE_STATE::START;
-	m_title_state = n_game_scene::ClGameScene::SCENE_STATE::END;
-	m_play_state = n_game_scene::ClGameScene::SCENE_STATE::END;
+	m_title_state = n_game_scene::ClGameScene::SCENE_STATE::START;
+	m_play_state = n_game_scene::ClGameScene::SCENE_STATE::SCENE_END;
+	m_end_state = n_game_scene::ClGameScene::SCENE_STATE::SCENE_END;
+	//変数
+	m_back_move_abs_speed = 1;
+	m_back_move_speed = 1;
+
+	//画像
+	m_title_back_img = ClImg();
+	m_title_logo_img = ClImg();
+	m_play_back_img_start = ClImg();
+	m_play_back_img_up = ClImg();
+	m_end_back_img = ClImg();
+	m_end_logo_img = ClImg();
+	//機体画像
+	m_player = ClImgColl();
+	for (int i = 0; i < ENEMY_KIND; i++) {
+		m_enemy_base[i] = ClImgCollCircle();
+	}
+	for (int i = 0; i < ENEMY_MAX; i++) {
+		m_enemy_use[i] = ClImgCollCircle();
+	}
+	m_enemy_drop_interval = TIME_START;
+	m_enemy_drop_interval_max = 4.0f;
+	//弾画像
+	m_shot_base = ClImgDivColl();
+	for (int i = 0; i < SHOT_MAX; i++) {
+		m_shot_use[i] = ClImgDivColl();
+	}
+	m_shot_div_x = 4;
+	m_shot_div_y = 1;
+	m_shot_div_max = m_shot_div_x * m_shot_div_y;
+	//音楽
+	m_title_audio = ClAudio();
+	m_play_audio = ClAudio();
+	m_end_audio = ClAudio();
+
 	return; 
 }
 
@@ -95,17 +155,17 @@ VOID ClGameScene::Destroy() {
 //								プロパティ
 //*--------------------------------------------------------------------------------*
 
-//ロード画面に切り替え
-VOID ClGameScene::ChangeSceneLoad() { MmChangeScene(GAME_SCENE::LOAD); }
-
 //タイトル画面に切り替え
 VOID ClGameScene::ChangeSceneTitle() { MmChangeScene(GAME_SCENE::TITLE); }
 
 //プレイ画面に切り替え
 VOID ClGameScene::ChangeScenePlay() { MmChangeScene(GAME_SCENE::PLAY); }
 
-//const float FADE_TIME = 0.25f;	//フェードする時間
-const float FADE_TIME = 2.0f;	//フェードする時間
+//エンド画面に切り替え
+VOID ClGameScene::ChangeSceneEnd() { MmChangeScene(GAME_SCENE::END); }
+
+const float FADE_TIME = 0.25f;	//フェードする時間
+//const float FADE_TIME = 2.0f;	//フェードする時間
 
 /// <summary>
 /// シーン変更開始処理
@@ -142,11 +202,6 @@ VOID ClGameScene::MmChangeScene(GAME_SCENE next_scene) {
 /// <param name="is_stop">停止させるか</param>
 VOID ClGameScene::MmSetProcStopState(GAME_SCENE scene, BOOL is_stop) {
 	switch (scene){
-		//ロード画面時
-	case n_game_scene::LOAD:
-		m_is_load_proc_stop = is_stop;
-		break;
-
 		//タイトル画面時
 	case n_game_scene::TITLE:
 		m_is_title_proc_stop = is_stop;
@@ -155,6 +210,11 @@ VOID ClGameScene::MmSetProcStopState(GAME_SCENE scene, BOOL is_stop) {
 		//プレイ画面時
 	case n_game_scene::PLAY:
 		m_is_play_proc_stop = is_stop;
+		break;
+
+		//エンド画面時
+	case n_game_scene::END:
+		m_is_end_proc_stop = is_stop;
 		break;
 
 	default:break;
@@ -168,14 +228,14 @@ VOID ClGameScene::MmSetProcStopState(GAME_SCENE scene, BOOL is_stop) {
 /// <param name="set_state">進行状態、変更先</param>
 VOID ClGameScene::MmSetSceneState(GAME_SCENE scene, SCENE_STATE set_state) {
 	switch (scene){
-	case n_game_scene::LOAD:
-		m_load_state = set_state;
-		break;
 	case n_game_scene::TITLE:
 		m_title_state = set_state;
 		break;
 	case n_game_scene::PLAY:
 		m_play_state = set_state;
+		break;
+	case n_game_scene::END:
+		m_end_state = set_state;
 		break;
 	default:
 		break;
@@ -186,22 +246,74 @@ VOID ClGameScene::MmSetSceneState(GAME_SCENE scene, SCENE_STATE set_state) {
 //								関数
 //*--------------------------------------------------------------------------------*
 
+const string CPP_NAME = "GameScene";
+
 //ゲームが開始前の処理
 VOID ClGameScene::GameInit() {
 
 	//*---------- ここから処理 ----------*
+	
+
+	//読み込み
+	//背景画像読み込み
+	//タイトル
+	m_title_back_img.Load(
+		"TitleBack.png", 0, TRUE,
+		CPP_NAME, "m_title_back_img");
+	//プレイ
+	m_play_back_img_start.Load(
+		"PlayBackStart.jpg", m_back_move_abs_speed, TRUE,
+		CPP_NAME, "m_play_back_start_img");
+	m_play_back_img_up.Load(
+		"PlayBackUp.jpg", m_back_move_abs_speed, TRUE,
+		CPP_NAME, "m_play_back_up_img");
+	m_play_back_img_up.SetPos(
+		n_xy::TOP_CENTER, n_xy::BUTTOM_CENTER);
+	//エンド
+	m_end_back_img.Load(
+		"EndBack.jpg", 0, TRUE,
+		CPP_NAME, "m_end_back_img");
+
+	//ロゴの読み込み
+	m_title_logo_img.Load(
+		"TitleLogo.png", 0, TRUE,
+		CPP_NAME, "m_title_logo_img");
+	m_title_logo_img.SetPos(n_xy::CENTER_CENTER, n_xy::CENTER_CENTER);
+	m_end_logo_img.Load(
+		"EndLogo.png", 0, TRUE,
+		CPP_NAME, "m_end_logo_img");
+	m_end_logo_img.SetPos(n_xy::CENTER_CENTER, n_xy::CENTER_CENTER);
+
+	//機体画像の読み込み
+	m_player.Load("Player.png", CPP_NAME, "m_player");
+
+	//敵画像の読み込み
+	for (int i = 0; i < ENEMY_KIND; i++) {
+		m_enemy_base[i].Load(enemy_path[i], CPP_NAME, "m_enemy");
+		m_enemy_base[i].SetAbsSpeed(1);
+	}
+
+	//弾画像の読み込み
+	m_shot_base.Load("ShotRed.png",
+		m_shot_div_x, m_shot_div_y, m_shot_div_max,
+		CPP_NAME, "m_shot");
+	for (int i = 0; i < SHOT_MAX; i++) {
+		m_shot_use[i] = m_shot_base;
+	}
+	
+	//Bgm読み込み
+	m_title_audio.BgmLoad(
+		"TitleBgm.mp3", CPP_NAME, "m_title_audio");
+	m_play_audio.BgmLoad(
+		"PlayBgm.mp3", CPP_NAME, "m_play_audio");
+	m_end_audio.BgmLoad(
+		"EndBgm.mp3", CPP_NAME, "m_end_audio");
 
 }
 
 //現在のゲームシーンによって処理を変える
 VOID ClGameScene::GameSceneSwitch() {
 	switch (m_scene){
-		//ロード画面
-	case n_game_scene::LOAD:
-		MmLoadProc();	//処理
-		MmLoadDraw();	//描画
-		break;
-
 		//タイトル画面
 	case n_game_scene::TITLE:
 		MmTitleProc();	//処理
@@ -213,6 +325,13 @@ VOID ClGameScene::GameSceneSwitch() {
 		MmPlayProc();	//処理
 		MmPlayDraw();	//描画
 		break;
+
+		//エンド画面
+	case n_game_scene::END:
+		MmEndProc();	//処理
+		MmEndDraw();	//描画
+		break;
+
 
 	default:break;
 	}
@@ -235,130 +354,6 @@ VOID ClGameScene::GameSceneSwitch() {
 }
 
 //*------------------------------------------------*
-//		ロード画面
-//*------------------------------------------------*
-
-#include IMG_COLL_HPP
-using namespace n_img_coll;
-ClImgColl img_coll1 = ClImgColl();
-ClImgCollCircle img_coll_circle = ClImgCollCircle();
-//ClImgColl img_coll2 = ClImgColl();
-
-#include MOUSE_HPP
-using namespace n_mouse;
-
-//#include COLL_CIRCLE_HPP
-//using namespace n_coll_circle;
-//ClCollCircle coll_circle = ClCollCircle();
-
-
-//ロード処理
-VOID ClGameScene::MmLoadProc() {
-	if (MmIsLoadProcDo() == FALSE) { return; }	//この先の処理は行わない
-
-	//*---------- ここから実行処理 ----------*
-
-	//img_coll1.Move(1, 1);
-	img_coll_circle.SetMove(ClMouse::GetIns()->GetPos().x, ClMouse::GetIns()->GetPos().y);
-	if (img_coll_circle.IsStay(img_coll1.GetCollRect()) == TRUE) { DrawString(600, 0, "aaa", ClCom().GetFlipColor()); }
-	//img_coll2.Move(-1, -1);
-	//if (img_coll1.IsStay(img_coll2.GetCollRect()) == TRUE) { DrawString(600, 600, "aaa",ClCom().GetFlipColor()); }
-
-	//if (img_coll1.IsStay(coll_circle.GetColl()) == TRUE) { DrawString(600, 0, "aaa", ClCom().GetFlipColor()); }
-	//if (img.GetPos().y > ClWin().GetWinHeight()) { img.SetPos(n_xy::TOP_CENTER,n_xy::BUTTOM_CENTER,0,1); }
-	//if (img_up.GetPos().y > ClWin().GetWinHeight()) { img_up.SetPos(n_xy::TOP_CENTER,n_xy::BUTTOM_CENTER,0,1); }
-}
-
-//ロード処理を行うか
-BOOL ClGameScene::MmIsLoadProcDo() {
-	MmSceneChangeProc();				//シーン変更
-	MmLoadStart();						//シーン切り替わり後最初の処理
-	MmLoadProcEnd();					//フェードアウト開始地点処理
-	MmLoadEnd();						//フェードアウト完了地点処理
-	if (m_is_load_proc_stop == TRUE) {	//この先の処理は行わない
-		return FALSE; 
-	}
-	MmLoadProcStart();					//フェードイン後の最初の処理
-
-	return TRUE;
-}
-
-//ロードシーン開始処理(m_sceneが変更したときに1度のみ)
-VOID ClGameScene::MmLoadStart() {
-	//1度のみの処理
-	if (m_load_state != n_game_scene::ClGameScene::SCENE_STATE::START) { return; }
-	m_load_state = n_game_scene::ClGameScene::SCENE_STATE::START_AFTER;
-
-	//*---------- ここから開始処理 ----------*
-
-
-
-	//coll_circle.SetColl(700, 600, 100);
-	//coll_circle.SetIsColl(TRUE);
-
-	img_coll1.Load("test.jpeg", "", "");
-	img_coll1.SetIsDraw();
-	img_coll1.SetAbsSpeed(1);
-
-	img_coll_circle.Load("test.jpeg", "", "");
-	img_coll_circle.SetIsDraw();
-	img_coll_circle.SetAbsSpeed(1);
-	img_coll_circle.SetPos(n_xy::CENTER_CENTER, n_xy::CENTER_CENTER);
-	//img_coll2.Load("test.jpeg", "", "");
-	//img_coll2.SetIsDraw();
-	//img_coll2.SetAbsSpeed(1);
-
-}		
-
-//ロード処理開始処理(フェードイン終わった後1度のみ)
-VOID ClGameScene::MmLoadProcStart() {
-	//1度のみの処理
-	if (m_load_state != n_game_scene::ClGameScene::SCENE_STATE::FADE_DOWN_END) { return; }
-	m_load_state = n_game_scene::ClGameScene::SCENE_STATE::FADE_DOWN_END_AFTER;
-
-	//*---------- ここから開始処理 ----------*
-}
-
-//フェードアウト開始地点処理(フェードアウト開始時1度のみ)
-VOID ClGameScene::MmLoadProcEnd() {
-	//1度のみの処理
-	if (m_load_state != n_game_scene::ClGameScene::SCENE_STATE::FADE_UP_START) { return; }
-	m_load_state = n_game_scene::ClGameScene::SCENE_STATE::FADE_UP_START_AFTER;
-
-	//*---------- ここから開始処理 ----------*
-}
-
-//フェードアウト完了地点処理(フェードアウト完了時1度のみ)
-VOID ClGameScene::MmLoadEnd() {
-	MmEnd(&m_load_state);		//シーン終了地点開始前処理
-
-	//*---------- ここから開始処理 ----------*
-
-}
-
-//ロード描画
-VOID ClGameScene::MmLoadDraw() {
-
-	img_coll1.Draw();
-	img_coll_circle.Draw();
-	//img_coll2.Draw();
-
-
-
-	//*---------- ↑描画処理は上に書く↑ ----------*
-	//フェード処理
-	if (m_is_change_secne == TRUE) { m_fade.FadeSameDraw(); }
-
-	if (ClWin().GetIsDebug() == FALSE) { return; }	//デバック状態ではないなら処理を行わない
-	//*---------- ここからデバック処理 ----------*
-
-	//coll_circle.DrawDebug(ClCom().GetRed());
-	
-	//現在の画面状態を表示
-	DrawString(ClWin().GetWinPivot().x, ClWin().GetWinPivot().y, "Load", ClCom().GetFlipColor());
-}
-
-//*------------------------------------------------*
 //		タイトル画面
 //*------------------------------------------------*
 
@@ -367,6 +362,13 @@ VOID ClGameScene::MmTitleProc() {
 	if (MmIsTitleProcDo() == FALSE) { return; }		//この先の処理は行わない
 
 	//*---------- ここから実行処理 ----------*
+
+	
+
+	//シーン切り替え
+	if (ClKeyboard::GetIns()->GetIsKeyDown(KEY_INPUT_SPACE) == TRUE) {
+		ChangeScenePlay();
+	}
 
 	
 }
@@ -392,6 +394,12 @@ VOID ClGameScene::MmTitleStart() {
 	m_title_state = n_game_scene::ClGameScene::SCENE_STATE::START_AFTER;
 
 	//*---------- ここから開始処理 ----------*
+	//マウスを表示
+	SetMouseDispFlag(TRUE);
+	 
+	//Bgm再生
+	m_title_audio.Sound();
+
 
 }
 
@@ -402,6 +410,7 @@ VOID ClGameScene::MmTitleProcStart() {
 	m_title_state = n_game_scene::ClGameScene::SCENE_STATE::FADE_DOWN_END_AFTER;
 
 	//*---------- ここから開始処理 ----------*
+	
 }
 
 //フェードアウト完了開始地点処理
@@ -411,17 +420,30 @@ VOID ClGameScene::MmTitleProcEnd() {
 	m_title_state = n_game_scene::ClGameScene::SCENE_STATE::FADE_UP_START_AFTER;
 
 	//*---------- ここから開始処理 ----------*
+	
 }
 
 //シーン終了地点処理
 VOID ClGameScene::MmTitleEnd() {
+	if (m_title_state != n_game_scene::ClGameScene::SCENE_STATE::SCENE_END) { return; }
+	m_title_state = n_game_scene::ClGameScene::SCENE_STATE::NEXT_SCENE;
+
 	MmEnd(&m_title_state);		//シーン終了地点開始前処理
 
 	//*---------- ここから開始処理 ----------*
+	//
+	//音楽を停止
+	m_title_audio.Stop();
 }
 
 //タイトル描画
 VOID ClGameScene::MmTitleDraw() {
+
+	//タイトルの画像を描画
+	m_title_back_img.Draw();
+	m_title_logo_img.Draw();
+
+	
 
 	//*---------- ↑描画処理は上に書く↑ ----------*
 	//フェード処理
@@ -434,6 +456,7 @@ VOID ClGameScene::MmTitleDraw() {
 
 	//現在の画面状態を表示
 	DrawString(ClWin().GetWinPivot().x, ClWin().GetWinPivot().y, "Title", ClCom().GetFlipColor());
+
 }
 
 //*------------------------------------------------*
@@ -445,6 +468,59 @@ VOID ClGameScene::MmPlayProc() {
 	if (MmIsPlayProcDo() == FALSE) { return; }		//この先の処理は行わない
 
 	//*---------- ここから実行処理 ----------*
+
+	//背景画像を移動
+	m_play_back_img_start.Move(0, m_back_move_speed);
+	m_play_back_img_up.Move(0, m_back_move_speed);
+	if (m_play_back_img_start.GetPos().y > ClWin().GetWinHeight()) {
+		m_play_back_img_start.SetPos(
+			n_xy::TOP_CENTER, n_xy::BUTTOM_CENTER, 0, 1);
+	}
+	if (m_play_back_img_up.GetPos().y > ClWin().GetWinHeight()) {
+		m_play_back_img_up.SetPos(
+			n_xy::TOP_CENTER, n_xy::BUTTOM_CENTER, 0, 1);
+	}
+
+	//プレイヤーの移動
+	m_player.SetMove(
+		ClMouse::GetIns()->GetPos().x - m_player.GetSize().x / 2,
+		ClMouse::GetIns()->GetPos().y - m_player.GetSize().y / 2);
+
+	//敵の生成
+	if (m_enemy_drop_interval < m_enemy_drop_interval_max) {
+		m_enemy_drop_interval += ClFps::GetIns()->GetDeltaTime();
+	}
+	else {
+		//敵のインターバルを初期化
+		m_enemy_drop_interval = TIME_START;
+
+		//敵を生成
+		for (int i = 0; i < ENEMY_MAX; i++) {
+			if (m_enemy_use[i].GetIsDraw() == FALSE) {
+				m_enemy_use[i] = m_enemy_base[i];
+				m_enemy_use[i].SetPos(
+					GetRand(ENEMY_MAX - 1) * ClWin().GetWinWidth() / 4,
+					-m_enemy_use[i].GetRadius()
+				);
+				m_enemy_use[i].SetIsDraw(TRUE);
+				break;
+			}
+		}
+	}
+
+	//敵の処理
+	for (int i = 0; i < ENEMY_MAX; i++) {
+		if (m_enemy_use[i].GetIsDraw() == TRUE) {
+			m_enemy_use[i].Move(0, 1);
+
+			if()
+		}
+	}
+
+	//シーン切り替え
+	if (ClKeyboard::GetIns()->GetIsKeyDown(KEY_INPUT_SPACE) == TRUE) {
+		ChangeSceneEnd();
+	}
 }
 
 //プレイ処理を行うか
@@ -468,6 +544,15 @@ VOID ClGameScene::MmPlayStart() {
 	m_play_state = n_game_scene::ClGameScene::SCENE_STATE::START_AFTER;
 
 	//*---------- ここから開始処理 ----------*
+	//マウスを非表示
+	SetMouseDispFlag(FALSE);
+
+	//Bgm再生
+	m_play_audio.Sound();
+
+	//プレイヤーの画像描画フラグ
+	m_player.SetIsDraw(TRUE, FALSE);
+	
 }
 
 //プレイシーン処理開始処理(フェードイン終わった後1度のみ)
@@ -477,6 +562,10 @@ VOID ClGameScene::MmPlayProcStart() {
 	m_play_state = n_game_scene::ClGameScene::SCENE_STATE::FADE_DOWN_END_AFTER;
 
 	//*---------- ここから開始処理 ----------*
+
+	//プレイヤー画像の当たり判定フラグ
+	m_player.SetIsDraw(TRUE, TRUE);
+	
 }
 
 //フェードアウト完了開始地点処理
@@ -486,17 +575,34 @@ VOID ClGameScene::MmPlayProcEnd() {
 	m_play_state = n_game_scene::ClGameScene::SCENE_STATE::FADE_UP_START_AFTER;
 
 	//*---------- ここから開始処理 ----------*
+	
 }
 
 //シーン終了地点処理
 VOID ClGameScene::MmPlayEnd() {
+	if (m_play_state != n_game_scene::ClGameScene::SCENE_STATE::SCENE_END) { return; }
+	m_play_state = n_game_scene::ClGameScene::SCENE_STATE::NEXT_SCENE;
+
 	MmEnd(&m_play_state);		//シーン終了地点開始前処理
 
 	//*---------- ここから開始処理 ----------*
+	
+	//敵のインターバルを初期化
+	m_enemy_drop_interval = TIME_START;
+
+	//Bgm停止
+	m_play_audio.Stop();
 }
 
 //プレイ描画
 VOID ClGameScene::MmPlayDraw() {
+
+	//背景画像の描画
+	m_play_back_img_start.Draw();
+	m_play_back_img_up.Draw();
+
+	//プレイヤーの画像を描画
+	m_player.Draw();
 
 	//*---------- ↑描画処理は上に書く↑ ----------*
 	//フェード処理
@@ -512,8 +618,8 @@ VOID ClGameScene::MmPlayDraw() {
 }
 
 VOID ClGameScene::MmEnd(SCENE_STATE* scene_state) {
-	if (*scene_state != n_game_scene::ClGameScene::SCENE_STATE::END) { return; }
-	*scene_state = n_game_scene::ClGameScene::SCENE_STATE::NEXT_SCENE;
+	//if (*scene_state != n_game_scene::ClGameScene::SCENE_STATE::SCENE_END) { return; }
+	//*scene_state = n_game_scene::ClGameScene::SCENE_STATE::NEXT_SCENE;
 
 	m_scene = m_next_scene;	//次のシーンへ
 	MmSetSceneState(m_scene, n_game_scene::ClGameScene::SCENE_STATE::START);
@@ -521,6 +627,102 @@ VOID ClGameScene::MmEnd(SCENE_STATE* scene_state) {
 	m_fade.FadeDownStart(FADE_TIME);					//画面フェードダウン開始
 	ClAudioMult::GetIns()->SetFadeUpStart(FADE_TIME);	//音量フェードアップ開始
 }
+
+
+//*------------------------------------------------*
+//		エンド画面
+//*------------------------------------------------*
+
+//エンド処理
+VOID ClGameScene::MmEndProc() {
+	if (MmIsEndProcDo() == FALSE) { return; }	//この先の処理は行わない
+
+	//*---------- ここから実行処理 ----------*
+	//シーン切り替え
+	if (ClKeyboard::GetIns()->GetIsKeyDown(KEY_INPUT_SPACE) == TRUE) {
+		ChangeSceneTitle();
+	}
+}
+
+//エンド処理を行うか
+BOOL ClGameScene::MmIsEndProcDo() {
+	MmSceneChangeProc();				//シーン変更
+	MmEndStart();						//シーン切り替わり後最初の処理
+	MmEndProcEnd();					//フェードアウト開始地点処理
+	MmEndEnd();						//フェードアウト完了地点処理
+	if (m_is_end_proc_stop == TRUE) {	//この先の処理は行わない
+		return FALSE;
+	}
+	MmEndProcStart();					//フェードイン後の最初の処理
+
+	return TRUE;
+}
+
+//エンドシーン開始処理(m_sceneが変更したときに1度のみ)
+VOID ClGameScene::MmEndStart() {
+	//1度のみの処理
+	if (m_end_state != n_game_scene::ClGameScene::SCENE_STATE::START) { return; }
+	m_end_state = n_game_scene::ClGameScene::SCENE_STATE::START_AFTER;
+
+	//*---------- ここから開始処理 ----------*
+	//マウスを表示
+	SetMouseDispFlag(TRUE);
+
+	//Bgm再生
+	m_end_audio.Sound();
+}
+
+//エンド処理開始処理(フェードイン終わった後1度のみ)
+VOID ClGameScene::MmEndProcStart() {
+	//1度のみの処理
+	if (m_end_state != n_game_scene::ClGameScene::SCENE_STATE::FADE_DOWN_END) { return; }
+	m_end_state = n_game_scene::ClGameScene::SCENE_STATE::FADE_DOWN_END_AFTER;
+
+	//*---------- ここから開始処理 ----------*
+	
+}
+
+//フェードアウト開始地点処理(フェードアウト開始時1度のみ)
+VOID ClGameScene::MmEndProcEnd() {
+	//1度のみの処理
+	if (m_end_state != n_game_scene::ClGameScene::SCENE_STATE::FADE_UP_START) { return; }
+	m_end_state = n_game_scene::ClGameScene::SCENE_STATE::FADE_UP_START_AFTER;
+
+	//*---------- ここから開始処理 ----------*
+	
+}
+
+//フェードアウト完了地点処理(フェードアウト完了時1度のみ)
+VOID ClGameScene::MmEndEnd() {
+	if (m_end_state != n_game_scene::ClGameScene::SCENE_STATE::SCENE_END) { return; }
+	m_end_state = n_game_scene::ClGameScene::SCENE_STATE::NEXT_SCENE;
+	MmEnd(&m_end_state);		//シーン終了地点開始前処理
+
+	//*---------- ここから開始処理 ----------*
+	
+
+	//Bgm停止
+	m_end_audio.Stop();
+}
+
+//エンド描画
+VOID ClGameScene::MmEndDraw() {
+
+	//画像を描画
+	m_end_back_img.Draw();
+	m_end_logo_img.Draw();
+
+	//*---------- ↑描画処理は上に書く↑ ----------*
+	//フェード処理
+	if (m_is_change_secne == TRUE) { m_fade.FadeSameDraw(); }
+
+	if (ClWin().GetIsDebug() == FALSE) { return; }	//デバック状態ではないなら処理を行わない
+	//*---------- ここからデバック処理 ----------*
+
+	//現在の画面状態を表示
+	DrawString(ClWin().GetWinPivot().x, ClWin().GetWinPivot().y, "End", ClCom().GetFlipColor());
+}
+
 
 //*------------------------------------------------*
 //		共通関数
@@ -538,7 +740,7 @@ VOID ClGameScene::MmSceneChangeProc() {
 	//フェードアウト処理が終了した時
 	if (m_fade.GetIsFadeNone() == TRUE && m_fade.GetFadeType() == n_fade::FADE_TYPE::FADE_UP_TYPE) {
 		//フェードアウト開始地点処理のフラグを立てる
-		MmSetSceneState(m_scene, n_game_scene::ClGameScene::SCENE_STATE::END);
+		MmSetSceneState(m_scene, n_game_scene::ClGameScene::SCENE_STATE::SCENE_END);
 	}
 
 	//フェードイン処理が終了した時
