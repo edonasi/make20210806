@@ -213,7 +213,7 @@ BOOL ClImgCollCircle::IsStay(n_rect::ClRect circle) {
 	return FALSE;
 }
 
-BOOL ClImgCollCircle::IsStay(n_circle::ClCircle circle) {
-	if (m_coll_circle.IsStay(circle) == TRUE) { return TRUE; }
+BOOL ClImgCollCircle::IsStay(n_circle::ClCircle circle, BOOL is_circle_coll) {
+	if (is_circle_coll==TRUE&&m_coll_circle.IsStay(circle) == TRUE) { return TRUE; }
 	return FALSE;
 }

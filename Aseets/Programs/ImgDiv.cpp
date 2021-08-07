@@ -445,6 +445,8 @@ int ClImgDivColl::GetRadius() { return m_coll.GetRadius(); }
 
 BOOL ClImgDivColl::GetIsDraw() { return m_is_draw; }
 
+BOOL ClImgDivColl::GetIsColl() { return m_coll.GetIsColl(); }
+
 int ClImgDivColl::GetAbsSpeed() { return m_abs_speed; }
 
 ClXY ClImgDivColl::GetSize() { return m_size; }

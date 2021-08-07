@@ -101,6 +101,7 @@ namespace n_img_div {
 		n_circle::ClCircle GetColl();
 		int GetRadius();
 		BOOL GetIsDraw();
+		BOOL GetIsColl();
 		int GetAbsSpeed();
 		n_xy::ClXY GetSize();
 		VOID SetIsDraw()override;

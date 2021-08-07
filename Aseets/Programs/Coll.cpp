@@ -199,12 +199,12 @@ BOOL ClColl::MmIsStay(n_circle::ClCircle m_circle, n_circle::ClCircle circle) {
 BOOL ClColl::MmIsCollEqualIn(n_circle::ClCircle m_circle, n_circle::ClCircle circle) {
 	if (m_is_coll == FALSE) { return FALSE; }		//当たり判定が作動していないなら更新しない
 
-	float bm = circle.center.x - circle.center.x;		//三角形の底辺の長さを求める
-	float ht = circle.center.y - circle.center.y;		//三角形の高さの長さを求める
+	float bm = m_circle.center.x - circle.center.x;		//三角形の底辺の長さを求める
+	float ht = m_circle.center.y - circle.center.y;		//三角形の高さの長さを求める
 	float sq = sqrtf(bm * bm + ht * ht);		//三角形の斜辺の長さを求める(sqrt=平方根)
 
 	//斜辺の長さが、円の半径よりも短いならば、円の中にいる
-	return (sq <= circle.radius) ? TRUE : FALSE;
+	return (sq <= m_circle.radius) ? TRUE : FALSE;
 }
 
 //円と点

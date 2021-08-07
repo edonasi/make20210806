@@ -69,7 +69,7 @@ namespace n_img_coll {
 		//“–‚½‚è”»’è
 		BOOL IsStay(n_xy::ClXY point);
 		BOOL IsStay(n_rect::ClRect rect);
-		BOOL IsStay(n_circle::ClCircle circle);
+		BOOL IsStay(n_circle::ClCircle circle,BOOL is_circle_coll);
 
 	private:
 		//		ƒƒ“ƒo•Ï”

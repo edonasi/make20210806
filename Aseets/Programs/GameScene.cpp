@@ -330,6 +330,7 @@ VOID ClGameScene::GameInit() {
 
 //現在のゲームシーンによって処理を変える
 VOID ClGameScene::GameSceneSwitch() {
+	
 	switch (m_scene){
 		//タイトル画面
 	case n_game_scene::TITLE:
@@ -614,7 +615,7 @@ VOID ClGameScene::MmPlayProc() {
 			}
 
 			for (int j = 0; j < SHOT_MAX; j++) {
-				if (m_enemy_use[i].IsStay(m_shot_use[j].coll_img.GetColl()) == TRUE) {
+				if (m_enemy_use[i].IsStay(m_shot_use[j].coll_img.GetColl(),m_shot_use[j].coll_img.GetIsColl()) == TRUE) {
 					m_enemy_use[i].SetIsDraw(FALSE);
 					m_shot_use[j].coll_img.SetIsDraw(FALSE);
 					m_score += 100;
@@ -624,7 +625,7 @@ VOID ClGameScene::MmPlayProc() {
 	}
 
 	//シーン切り替え
-	if (ClKeyboard::GetIns()->GetIsKeyDown(KEY_INPUT_SPACE) == TRUE) {
+	if (m_score>=200) {
 		ChangeSceneEnd();
 	}
 }
@@ -715,6 +716,8 @@ VOID ClGameScene::MmPlayDraw() {
 
 	//プレイヤーの画像を描画
 	m_player.Draw();
+
+	DrawFormatString(0, 64, ClCom().GetFlipColor(), "SCORE : %d", m_score);
 
 	//*---------- ↑描画処理は上に書く↑ ----------*
 	//フェード処理
